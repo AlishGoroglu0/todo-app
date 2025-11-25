@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 
-
+const storageKey = 'TaskListdata'
 let InitialTasks = [
     {Id : 0 , Task: "Test"},
     {Id : 1 , Task: "test2"},
@@ -13,8 +13,21 @@ function App() {
   
   
   const [selectedTask , setSelectedTaskID] = useState(null);
-  const [Tasks , setTasks] = useState(InitialTasks)
+  const [Tasks , setTasks] = useState(getInitialTasks)
   const [Taskinput , setTaskinput] = useState('')
+
+
+  useEffect(() => {
+
+    const taskString = JSON.stringify(Tasks);
+
+    localStorage.setItem(storageKey , taskString)
+
+    console.log("Task Saved")
+
+
+  },[Tasks])
+
 
 
   function HandleRemove() {
@@ -33,6 +46,14 @@ function App() {
   }
 
 
+  function handleClearStorage() {
+
+    localStorage.removeItem('TaskListdata')
+
+    setTasks([]);
+    
+  }
+
   function HandleAdd(e) {
     e.preventDefault();
     if (Taskinput.trim() === '') {
@@ -40,7 +61,10 @@ function App() {
       return;
     }
     
-    const newID = Tasks.length > 0 ? Math.max(...Tasks.map(task => task.Id)) + 1 : 0;
+
+  const newID = Tasks.length > 0 
+    ? Math.max(...Tasks.map(task => task.Id)) + 1 
+    : 0;
    
     const newTask = {
     Id: newID,
@@ -54,6 +78,22 @@ function App() {
 
   }
   
+
+
+  
+
+  function getInitialTasks() {
+    const savedTasks = localStorage.getItem(storageKey)
+    if (savedTasks) {
+
+      return JSON.parse(savedTasks)
+      
+    }
+    else{
+      return InitialTasks
+    }
+    
+  }
 
 
 const handleselection = (Id) =>{
